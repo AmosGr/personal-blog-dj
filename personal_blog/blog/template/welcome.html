@@ -1,100 +1,161 @@
-<!-- blog/template/welcome.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Estudos Django - EBAC e Doc</title>
+    <title>Bem-vindo ao Blog</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            height: 100vh; /* Faz com que ocupe toda a altura da tela */
+            min-height: 100vh; /* Garante que o conteúdo ocupe pelo menos toda a altura da tela */
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex-direction: column;
+            align-items: center; /* Centraliza horizontalmente */
+            justify-content: flex-start; /* Alinha no topo da página */
             background: linear-gradient(to bottom right, #1b1313, #800000);
+            color: #ffffff; /* Cor do texto principal */
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 80%; /* Largura do conteúdo principal */
+            max-width: 800px; /* Largura máxima para responsividade */
+            margin-top: 60px; /* Espaçamento do topo da página */
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
         }
         form {
-            width: 300px; /* largura do formulário */
-            padding: 20px;
-            background-color: hsl(0, 25%, 50%);
+            
+            background-color: hsl(0, 50%, 14%);
+            padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(110, 41, 41, 0.726);
+            margin-bottom: 20px;
         }
         form label {
             display: block;
-            margin-bottom: 15px;
-        }
-        form input {
-            width: calc(100% - 12px); /* ajusta o tamanho do input */
-            padding: 10px;
             margin-bottom: 10px;
-            border-radius: 12px;
-            border: 1px solid #ccc;
+            color: #c7a8a8; /* Cor do texto das labels */
+        }
+        form input, form select, form textarea {
+            width: 100%; /* Ajusta o tamanho para o máximo sem quebrar a borda */
+            padding: 5px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #8d8686;
+            background-color: #a06c64;
+            color: #ffffff; /* Cor do texto nos inputs */
+            font-family: Arial, sans-serif; /* Fonte do texto */
+        }
+        form textarea {
+            min-height: 2%; /* Altura inicial */
+            resize: vertical; /* Permite redimensionamento vertical */
+            font-size: small;
         }
         form button {
             width: 100%;
-            padding: 35px;
-            background-color: #690303;
+            padding: 10px;
+            background-color: #d69292;
             color: rgba(31, 4, 4, 0.712);
             border: none;
             border-radius: 4px;
             cursor: pointer;
         }
-        .tag_label {
-            width: calc(100% - 12px);
-            background-color: rgba(182, 145, 145, 0.5); /* Cor de fundo com transparência */
+        .messages {
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 0;
+            list-style-type: none;
+        }
+        .messages li {
             padding: 10px;
             margin-bottom: 10px;
-            border-radius: 12px;
-            text-align: start;
-            color: #3f0404; /* Cor do texto em vinho escuro */
-            font-size: 15px;
-            font-family: 'Times New Roman', Times, serif;
-            font-style: italic, bold;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+            border-radius: 4px;
         }
-        .mensage {
-            background-color: rgba(70, 13, 13, 0.637); /* Cor de fundo com transparência */
-            padding: 35px;
-            border-radius: 08px;
+        .messages li.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .messages li.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .published-posts {
+            width: 100%;
+        }
+        .published-posts ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .published-posts li {
             text-align: center;
-            color: #b98383e0; /* Cor do texto em vinho escuro */
-            font-size: 24px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
-            cursor: pointer;
+            background-color: hsl(0, 50%, 14%);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        .final_mensage {
-            background-color: rgba(255, 255, 255, 0.5); /* Cor de fundo com transparência */
-            padding: 35px;
-            border-radius: 08px;
-            text-align: end;
-            color: #800000; /* Cor do texto em vinho escuro */
-            font-size: 24px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+        .published-posts h2 {
+            text-align: center;
+            margin-top: 0;
         }
     </style>
 </head>
 <body>
-    <div class="mensage">
-        <h1>Te amo, Larissa Melo !</h1>
-    </div>
-    {% if name and last_name and age %}
-        <p class="final_mensage">Olá, {{ name }} {{ last_name }}! Você tem {{ age }} anos.</p>
-    {% else %}
+    <div class="container">
+        <h1>Bem-vindo ao Blog</h1>
+
+        <!-- Mensagens de feedback após a criação de um post -->
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <!-- Formulário para criar um novo post -->
         <form method="post">
             {% csrf_token %}
-            <label class='tag_label' for="name">Nome:</label>
-            <input type="text" id="name" name="name" required>
+            {{ form.non_field_errors }}
+            
+            <label class='tag_label' for="id_title">Título:</label>
+            {{ form.title }}
+            {{ form.title.errors }}
 
-            <label class='tag_label' for="last_name">Sobrenome:</label>
-            <input type="text" id="last_name" name="last_name" required>
+            <label class='tag_label' for="id_author">Autor:</label>
+            {{ form.author }}
+            {{ form.author.errors }}
 
-            <label class='tag_label' for="age">Idade:</label>
-            <input type="number" id="age" name="age" required>
+            <label class='tag_label' for="id_content">Texto:</label>
+            {{ form.content }}
+            {{ form.content.errors }}
 
-            <button type="submit">Enviar</button>
+            <label class='tag_label' for="id_status">Status:</label>
+            {{ form.status }}
+            {{ form.status.errors }}
+
+            <button type="submit">Criar Post</button>
         </form>
-    {% endif %}
+
+        <!-- Lista de posts publicados -->
+        <div class="published-posts">
+            {% if published_posts %}
+                <h2>Posts Publicados</h2>
+                <ul>
+                    {% for post in published_posts %}
+                        <li>
+                            <h3>{{ post.title }}</h3>
+                            <p>Por {{ post.author.username }} em {{ post.created_on }}</p>
+                            <p>{{ post.content }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Nenhum post publicado ainda.</p>
+            {% endif %}
+        </div>
+    </div>
 </body>
 </html>
