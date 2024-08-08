@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models.post import Post
+from .models import Comment,Post
 
 
 class PostAdmin(admin.ModelAdmin):
@@ -11,7 +11,18 @@ class PostAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title','author')}
 
 
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('name','body',"post",'created_on','active')
+    list_filter = ("active","created_on")
+    search_fields = ("name","email","body")
+    actions = ["approve_comments"]
+
+    def approve_comments(self, request, queryset):
+        queryset.update(active=True)
 
 
 # Adding Post model on admin page. 
 admin.site.register(Post,PostAdmin)
+
+#admin.site.register(Comment,CommentAdmin)
